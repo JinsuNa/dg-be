@@ -7,12 +7,16 @@ import com.project.daeng_geun.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -79,6 +83,15 @@ public class UserService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             if (passwordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
+
+                // ✅ 인증 처리: 세션에 수동으로 인증 정보 넣기
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        user.getEmail(),
+                        null,
+                        List.of(new SimpleGrantedAuthority("ROLE_USER")) // 권한 부여
+                );
+                SecurityContextHolder.getContext().setAuthentication(authentication); // 세션에 저장
+
                 Map<String, Object> response = new HashMap<>();
                 response.put("userId", user.getId());
                 response.put("email", user.getEmail());

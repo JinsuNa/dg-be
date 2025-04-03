@@ -32,16 +32,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화 (프론트엔드 연동)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS 활성화
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // 회원가입 & 로그인 API는 인증 없이 허용
-                        .requestMatchers("/api/user/register", "/api/user/login","/api/**").permitAll()
-                        .requestMatchers("/ws-chat/**").permitAll()
+                        .requestMatchers("/api/user/register", "/api/user/login", "/api/user/check-*", "/ws-chat/**")
+                        .permitAll()
+                        .anyRequest().authenticated()
                 )
-
-                .formLogin(form -> form.disable()); // ❌ Spring 기본 로그인 폼 비활성화
-//                .httpBasic(httpBasic -> httpBasic.disable()); // ❌ Basic Auth 비활성화 (JWT 사용)
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable());
 
         return http.build();
     }
