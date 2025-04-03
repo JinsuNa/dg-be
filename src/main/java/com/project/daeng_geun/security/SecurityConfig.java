@@ -36,12 +36,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS 활성화
                 .authorizeHttpRequests(auth -> auth
                         // 회원가입 & 로그인 API는 인증 없이 허용
-                        .requestMatchers("/api/**").permitAll() // /api/** 전부 허용
-                        .requestMatchers("/ws-chat/**").permitAll() // 필요 시 WebSocket도 허용
-                        .anyRequest().authenticated() // 이외 요청은 인증 필요
+                        .requestMatchers("/api/user/register", "/api/user/login","/api/**").permitAll()
+                        .requestMatchers("/ws-chat/**").permitAll()
                 )
 
                 .formLogin(form -> form.disable()); // ❌ Spring 기본 로그인 폼 비활성화
+//                .httpBasic(httpBasic -> httpBasic.disable()); // ❌ Basic Auth 비활성화 (JWT 사용)
 
         return http.build();
     }
@@ -49,15 +49,14 @@ public class SecurityConfig {
     // CORS 설정 추가
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://3.37.145.80")); // or 프론트 주소
-        config.setAllowCredentials(true); // ✅ 이게 핵심!
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://3.37.145.80")); // React 프론트엔드 허용
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }
