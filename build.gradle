@@ -1,0 +1,63 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.project'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+//	JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//	Web socket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+//	이메일
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+//	스프링 스큐리티
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+//	스프링 웹
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+//	스프링 dev tools
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//	웹소켓
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+//	롬복
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+//	mysql
+	runtimeOnly 'com.mysql:mysql-connector-j'
+//	s3
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1'
+//	테스트 코드
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// 비밀번호 암호화를 위한 라이브러리
+	implementation 'org.springframework.security:spring-security-crypto'
+	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5") // JSON 처리 (필수)
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
