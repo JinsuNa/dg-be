@@ -42,7 +42,6 @@ public class SecurityConfig {
                 )
 
                 .formLogin(form -> form.disable()); // ❌ Spring 기본 로그인 폼 비활성화
-//                .httpBasic(httpBasic -> httpBasic.disable()); // ❌ Basic Auth 비활성화 (JWT 사용)
 
         return http.build();
     }
