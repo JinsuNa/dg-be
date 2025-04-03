@@ -9,34 +9,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 체크아웃
+      - name: 📦 코드 체크아웃
         uses: actions/checkout@v3
 
-      - name: JDK 17 사용
+      - name: ☕ JDK 17 설치
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Gradle Wrapper 실행 권한 추가
+      - name: ⚙️ Gradle Wrapper 실행 권한 부여
         run: chmod +x gradlew
 
-      - name: Gradle로 빌드(CI)
-        run: ./gradlew build -x test
+      - name: 🧹 Gradle로 클린 빌드 (캐시 제거)
+        run: ./gradlew clean build -x test
 
-      - name: 도커허브에 로그인
+      - name: 🐳 도커허브 로그인
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USER_NAME }}
           password: ${{ secrets.DOCKER_USER_PW }}
 
-      - name: 백엔드 이미지 빌드
-        run: docker build -t ${{ secrets.DOCKER_USER_NAME }}/${{ secrets.DOCKER_IMAGE_NAME }}-be .
+      - name: 🔨 도커 이미지 빌드 (캐시 제거)
+        run: docker build --no-cache -t ${{ secrets.DOCKER_USER_NAME }}/${{ secrets.DOCKER_IMAGE_NAME }}-be .
 
-      - name: 이미지 푸시
+      - name: 🚀 도커 이미지 푸시
         run: docker push ${{ secrets.DOCKER_USER_NAME }}/${{ secrets.DOCKER_IMAGE_NAME }}-be
 
-      - name: AWS EC2에 ssh 접속 후 백엔드 배포
+      - name: ☁️ AWS EC2에 SSH 접속 후 배포
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AWS_IP }}
@@ -45,11 +45,20 @@ jobs:
           key: ${{ secrets.AWS_KEY }}
           script: |
             timedatectl set-timezone Asia/Seoul
-            # 도커 캐시 클리어
+
+            echo "🔁 기존 도커 정리"
+            docker-compose down || true
             docker rm -f $(docker ps -aq) || true
             docker rmi -f $(docker images -aq) || true
-            docker volume prune -f || true
+            docker volume prune -f -y || true
+            docker system prune -af || true
+
+            echo "🧾 .env 파일 생성"
             echo "S3_ACCESSKEY=${{ secrets.S3_ACCESSKEY }}" > .env
             echo "S3_SECRETKEY=${{ secrets.S3_SECRETKEY }}" >> .env
+
+            echo "⬇️ 이미지 풀"
             docker pull ${{ secrets.DOCKER_USER_NAME }}/${{ secrets.DOCKER_IMAGE_NAME }}-be
+
+            echo "🚀 컨테이너 재배포"
             docker-compose up -d --force-recreate
