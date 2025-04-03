@@ -41,7 +41,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated() // 이외 요청은 인증 필요
                 )
 
-                .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)) // ✅ JWT 기반이므로 세션 사용 안 함
                 .formLogin(form -> form.disable()); // ❌ Spring 기본 로그인 폼 비활성화
 //                .httpBasic(httpBasic -> httpBasic.disable()); // ❌ Basic Auth 비활성화 (JWT 사용)
 
