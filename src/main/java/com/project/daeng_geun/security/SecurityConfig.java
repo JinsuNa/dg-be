@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/register", "/api/user/login", "/api/**")
+                        .requestMatchers("/api/user/register", "/api/user/login", "/api/**","/ws-chat/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
